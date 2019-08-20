@@ -1,0 +1,70 @@
+def appName = "CySmart"
+def appVersion = "1.2.0"
+
+apply plugin: 'com.android.application'
+
+buildscript {
+    repositories {
+        mavenCentral()
+	jcenter()
+        google()
+    }
+    dependencies {
+        classpath 'com.android.tools.build:gradle:3.4.2'
+    }
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+	jcenter()
+        google()
+    }
+}
+
+dependencies {
+    implementation fileTree(include: '*.jar', dir: 'libs')
+    implementation files('libs/achartengine-1.0.0.jar')
+}
+
+android {
+    compileSdkVersion 27
+    sourceSets {
+        main {
+            manifest.srcFile 'AndroidManifest.xml'
+            java.srcDirs = ['src']
+            resources.srcDirs = ['src']
+            aidl.srcDirs = ['src']
+            renderscript.srcDirs = ['src']
+            res.srcDirs = ['res']
+            assets.srcDirs = ['assets']
+        }
+
+        // Move the tests to tests/java, tests/res, etc...
+        //instrumentTest.setRoot('tests') //TODO: instrumentTest is not supported by the new version of Gradle plugin
+
+        // Move the build types to build-types/<type>
+        // For instance, build-types/debug/java, build-types/debug/AndroidManifest.xml, ...
+        // This moves them out of them default location under src/<type>/... which would
+        // conflict with src/ being used by the main source set.
+        // Adding new build types or product flavors should be accompanied
+        // by a similar customization.
+        debug.setRoot('build-types/debug')
+        release.setRoot('build-types/release')
+    }
+    defaultConfig {
+        minSdkVersion 22
+        targetSdkVersion 26
+        // Set manifest's versionName
+        def ver = "${appVersion}.${System.getenv('BUILD_NUMBER') ?: 0}"
+        manifestPlaceholders = [version_name: ver]
+        setProperty("archivesBaseName", "${appName}_${ver}")
+    }
+    buildTypes {
+        release {
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.txt'
+        }
+    }
+    productFlavors {
+    }
+}
